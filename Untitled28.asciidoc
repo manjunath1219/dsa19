@@ -1,0 +1,756 @@
++*In[ ]:*+
+[source, ipython3]
+----
+<aside>
+💡 1. **Merge k Sorted Lists**
+
+You are given an array of `k` linked-lists `lists`, each linked-list is sorted in ascending order.
+
+*Merge all the linked-lists into one sorted linked-list and return it.*
+
+**Example 1:**
+
+```
+Input: lists = [[1,4,5],[1,3,4],[2,6]]
+Output: [1,1,2,3,4,4,5,6]
+Explanation: The linked-lists are:
+[
+  1->4->5,
+  1->3->4,
+  2->6
+]
+merging them into one sorted list:
+1->1->2->3->4->4->5->6
+
+```
+
+**Example 2:**
+
+```
+Input: lists = []
+Output: []
+
+```
+
+**Example 3:**
+
+```
+Input: lists = [[]]
+Output: []
+
+```
+
+**Constraints:**
+
+- `k == lists.length`
+- `0 <= k <= 10000`
+- `0 <= lists[i].length <= 500`
+- `-10000 <= lists[i][j] <= 10000`
+- `lists[i]` is sorted in **ascending order**.
+- The sum of `lists[i].length` will not exceed `10000`.
+</aside>
+----
+
+
++*In[1]:*+
+[source, ipython3]
+----
+import heapq
+
+class ListNode:
+    def __init__(self, val=0, next=None):
+        self.val = val
+        self.next = next
+
+def mergeKLists(lists):
+    heap = []
+    dummy = ListNode()
+    curr = dummy
+
+    # Push the first node of each list into the min-heap
+    for i in range(len(lists)):
+        if lists[i]:
+            heapq.heappush(heap, (lists[i].val, i))
+
+    while heap:
+        val, idx = heapq.heappop(heap)
+        curr.next = ListNode(val)
+        curr = curr.next
+
+        if lists[idx].next:
+            lists[idx] = lists[idx].next
+            heapq.heappush(heap, (lists[idx].val, idx))
+
+    return dummy.next
+
+# Helper function to create a linked list from a list
+def createLinkedList(arr):
+    dummy = ListNode()
+    curr = dummy
+    for val in arr:
+        curr.next = ListNode(val)
+        curr = curr.next
+    return dummy.next
+
+# Example 1
+lists1 = [
+    createLinkedList([1, 4, 5]),
+    createLinkedList([1, 3, 4]),
+    createLinkedList([2, 6])
+]
+result1 = mergeKLists(lists1)
+while result1:
+    print(result1.val, end=" ")
+    result1 = result1.next
+# Output: 1 1 2 3 4 4 5 6
+print()
+
+# Example 2
+lists2 = []
+result2 = mergeKLists(lists2)
+while result2:
+    print(result2.val, end=" ")
+    result2 = result2.next
+# Output: (empty list)
+print()
+
+# Example 3
+lists3 = [[]]
+result3 = mergeKLists(lists3)
+while result3:
+    print(result3.val, end=" ")
+    result3 = result3.next
+# Output: (empty list)
+print()
+----
+
+
++*Out[1]:*+
+----
+1 1 2 3 4 4 5 6 
+
+
+----
+
+
++*In[ ]:*+
+[source, ipython3]
+----
+
+----
+
+
++*In[ ]:*+
+[source, ipython3]
+----
+<aside>
+💡 2. **Count of Smaller Numbers After Self**
+
+Given an integer array `nums`, return *an integer array* `counts` *where* `counts[i]` *is the number of smaller elements to the right of* `nums[i]`.
+
+**Example 1:**
+
+```
+Input: nums = [5,2,6,1]
+Output: [2,1,1,0]
+Explanation:
+To the right of 5 there are2 smaller elements (2 and 1).
+To the right of 2 there is only1 smaller element (1).
+To the right of 6 there is1 smaller element (1).
+To the right of 1 there is0 smaller element.
+
+```
+
+**Example 2:**
+
+```
+Input: nums = [-1]
+Output: [0]
+
+```
+
+**Example 3:**
+
+```
+Input: nums = [-1,-1]
+Output: [0,0]
+
+```
+
+**Constraints:**
+
+- `1 <= nums.length <= 100000`
+- `-10000 <= nums[i] <= 10000`
+</aside>
+----
+
+
++*In[8]:*+
+[source, ipython3]
+----
+def countSmaller(nums):
+    def mergeAndCount(subarray1, subarray2):
+        count = 0
+        i, j = 0, 0
+        merged = []
+
+        while i < len(subarray1) and j < len(subarray2):
+            if subarray1[i] > subarray2[j]:
+                count += len(subarray1) - i
+                merged.append(subarray2[j])
+                j += 1
+            else:
+                merged.append(subarray1[i])
+                i += 1
+
+        merged.extend(subarray1[i:])
+        merged.extend(subarray2[j:])
+        return merged, count
+
+    def mergeSort(arr):
+        if len(arr) <= 1:
+            return arr, 0
+
+        mid = len(arr) // 2
+        left, left_count = mergeSort(arr[:mid])
+        right, right_count = mergeSort(arr[mid:])
+        merged, count = mergeAndCount(left, right)
+
+        return merged, left_count + right_count + count
+
+    _, counts = mergeSort(nums)
+    return counts
+----
+
+
++*In[9]:*+
+[source, ipython3]
+----
+# Example 1
+nums1 = [5, 2, 6, 1]
+result1 = countSmaller(nums1)
+print(result1)  # Output: [2, 1, 1, 0]
+
+# Example 2
+nums2 = [-1]
+result2 = countSmaller(nums2)
+print(result2)  # Output: [0]
+
+# Example 3
+nums3 = [-1, -1]
+result3 = countSmaller(nums3)
+print(result3)  # Output: [0, 0]
+----
+
+
++*Out[9]:*+
+----
+4
+0
+0
+----
+
+
++*In[ ]:*+
+[source, ipython3]
+----
+
+----
+
+
++*In[ ]:*+
+[source, ipython3]
+----
+<aside>
+💡 3. **Sort an Array**
+
+Given an array of integers `nums`, sort the array in ascending order and return it.
+
+You must solve the problem **without using any built-in** functions in `O(nlog(n))` time complexity and with the smallest space complexity possible.
+
+**Example 1:**
+
+```
+Input: nums = [5,2,3,1]
+Output: [1,2,3,5]
+Explanation: After sorting the array, the positions of some numbers are not changed (for example, 2 and 3), while the positions of other numbers are changed (for example, 1 and 5).
+
+```
+
+**Example 2:**
+
+```
+Input: nums = [5,1,1,2,0,0]
+Output: [0,0,1,1,2,5]
+Explanation: Note that the values of nums are not necessairly unique.
+
+```
+
+**Constraints:**
+
+- `1 <= nums.length <= 5 * 10000`
+- `-5 * 104 <= nums[i] <= 5 * 10000`
+</aside>
+----
+
+
++*In[10]:*+
+[source, ipython3]
+----
+def sortArray(nums):
+    def merge(subarray1, subarray2):
+        i, j = 0, 0
+        merged = []
+
+        while i < len(subarray1) and j < len(subarray2):
+            if subarray1[i] <= subarray2[j]:
+                merged.append(subarray1[i])
+                i += 1
+            else:
+                merged.append(subarray2[j])
+                j += 1
+
+        merged.extend(subarray1[i:])
+        merged.extend(subarray2[j:])
+        return merged
+
+    def mergeSort(arr):
+        if len(arr) <= 1:
+            return arr
+
+        mid = len(arr) // 2
+        left = mergeSort(arr[:mid])
+        right = mergeSort(arr[mid:])
+        merged = merge(left, right)
+
+        return merged
+
+    return mergeSort(nums)
+# Example 1
+nums1 = [5, 2, 3, 1]
+result1 = sortArray(nums1)
+print(result1)  
+# Example 2
+nums2 = [5, 1, 1, 2, 0, 0]
+result2 = sortArray(nums2)
+print(result2) 
+----
+
+
++*Out[10]:*+
+----
+[1, 2, 3, 5]
+[0, 0, 1, 1, 2, 5]
+----
+
+
++*In[ ]:*+
+[source, ipython3]
+----
+
+----
+
+
++*In[ ]:*+
+[source, ipython3]
+----
+💡 4. **Move all zeroes to end of array**
+
+Given an array of random numbers, Push all the zero’s of a given array to the end of the array. For example, if the given arrays is {1, 9, 8, 4, 0, 0, 2, 7, 0, 6, 0}, it should be changed to {1, 9, 8, 4, 2, 7, 6, 0, 0, 0, 0}. The order of all other elements should be same. Expected time complexity is O(n) and extra space is O(1).
+
+**Example:**
+
+Input :  arr[] = {1, 2, 0, 4, 3, 0, 5, 0};
+Output : arr[] = {1, 2, 4, 3, 5, 0, 0, 0};
+
+Input : arr[]  = {1, 2, 0, 0, 0, 3, 6};
+Output : arr[] = {1, 2, 3, 6, 0, 0, 0};
+----
+
+
++*In[11]:*+
+[source, ipython3]
+----
+def moveZeroesToEnd(arr):
+    left = 0
+    right = len(arr) - 1
+
+    while left < right:
+        if arr[left] == 0 and arr[right] != 0:
+            arr[left], arr[right] = arr[right], arr[left]
+
+        if arr[left] != 0:
+            left += 1
+
+        if arr[right] == 0:
+            right -= 1
+
+    return arr
+# Example 1
+arr1 = [1, 9, 8, 4, 0, 0, 2, 7, 0, 6, 0]
+result1 = moveZeroesToEnd(arr1)
+print(result1)  
+
+# Example 2
+arr2 = [1, 2, 0, 4, 3, 0, 5, 0]
+result2 = moveZeroesToEnd(arr2)
+print(result2)  
+
+# Example 3
+arr3 = [1, 2, 0, 0, 0, 3, 6]
+result3 = moveZeroesToEnd(arr3)
+print(result3)
+----
+
+
++*Out[11]:*+
+----
+[1, 9, 8, 4, 6, 7, 2, 0, 0, 0, 0]
+[1, 2, 5, 4, 3, 0, 0, 0]
+[1, 2, 6, 3, 0, 0, 0]
+----
+
+
++*In[ ]:*+
+[source, ipython3]
+----
+
+----
+
+
++*In[ ]:*+
+[source, ipython3]
+----
+💡 5. **Rearrange array in alternating positive & negative items with O(1) extra space**
+
+Given an **array of positive** and **negative numbers**, arrange them in an **alternate** fashion such that every positive number is followed by a negative and vice-versa maintaining the **order of appearance**. The number of positive and negative numbers need not be equal. If there are more positive numbers they appear at the end of the array. If there are more negative numbers, they too appear at the end of the array.
+
+**Examples:**
+
+Input:  arr[] = {1, 2, 3, -4, -1, 4}
+Output: arr[] = {-4, 1, -1, 2, 3, 4}
+
+Input:  arr[] = {-5, -2, 5, 2, 4, 7, 1, 8, 0, -8}
+Output: arr[] = {-5, 5, -2, 2, -8, 4, 7, 1, 8, 0}
+----
+
+
++*In[12]:*+
+[source, ipython3]
+----
+def rearrangeAlternate(arr):
+    positive = 0
+    negative = 0
+
+    while positive < len(arr) and negative < len(arr):
+        while positive < len(arr) and arr[positive] > 0:
+            positive += 1
+
+        if positive == len(arr):
+            return arr
+
+        negative = positive + 1
+
+        while negative < len(arr) and arr[negative] > 0:
+            negative += 1
+
+        if negative == len(arr):
+            return arr
+
+        temp = arr[negative]
+
+        for i in range(negative, positive, -1):
+            arr[i] = arr[i - 1]
+
+        arr[positive] = temp
+
+        positive += 2
+        negative += 2
+
+    return arr
+# Example 1
+arr1 = [1, 2, 3, -4, -1, 4]
+result1 = rearrangeAlternate(arr1)
+print(result1) 
+
+# Example 2
+arr2 = [-5, -2, 5, 2, 4, 7, 1, 8, 0, -8]
+result2 = rearrangeAlternate(arr2)
+print(result2)
+----
+
+
++*Out[12]:*+
+----
+[1, 2, 3, -1, -4, 4]
+[-2, -5, 5, 2, 4, 7, 1, 8, -8, 0]
+----
+
+
++*In[ ]:*+
+[source, ipython3]
+----
+
+----
+
+
++*In[ ]:*+
+[source, ipython3]
+----
+<aside>
+💡 **6. Merge two sorted arrays**
+
+Given two sorted arrays, the task is to merge them in a sorted manner.
+
+**Examples:**
+
+> Input: arr1[] = { 1, 3, 4, 5}, arr2[] = {2, 4, 6, 8} 
+Output: arr3[] = {1, 2, 3, 4, 4, 5, 6, 8}
+
+Input: arr1[] = { 5, 8, 9}, arr2[] = {4, 7, 8}
+Output: arr3[] = {4, 5, 7, 8, 8, 9}
+> 
+</aside>
+----
+
+
++*In[13]:*+
+[source, ipython3]
+----
+def mergeSortedArrays(arr1, arr2):
+    merged = []
+    p1, p2 = 0, 0
+
+    while p1 < len(arr1) and p2 < len(arr2):
+        if arr1[p1] <= arr2[p2]:
+            merged.append(arr1[p1])
+            p1 += 1
+        else:
+            merged.append(arr2[p2])
+            p2 += 1
+
+    while p1 < len(arr1):
+        merged.append(arr1[p1])
+        p1 += 1
+
+    while p2 < len(arr2):
+        merged.append(arr2[p2])
+        p2 += 1
+
+    return merged
+# Example 1
+arr1 = [1, 3, 4, 5]
+arr2 = [2, 4, 6, 8]
+result1 = mergeSortedArrays(arr1, arr2)
+print(result1) 
+
+# Example 2
+arr3 = [5, 8, 9]
+arr4 = [4, 7, 8]
+result2 = mergeSortedArrays(arr3, arr4)
+print(result2)
+----
+
+
++*Out[13]:*+
+----
+[1, 2, 3, 4, 4, 5, 6, 8]
+[4, 5, 7, 8, 8, 9]
+----
+
+
++*In[ ]:*+
+[source, ipython3]
+----
+
+----
+
+
++*In[ ]:*+
+[source, ipython3]
+----
+<aside>
+💡 7. **Intersection of Two Arrays**
+
+Given two integer arrays `nums1` and `nums2`, return *an array of their intersection*. Each element in the result must be **unique** and you may return the result in **any order**.
+
+**Example 1:**
+
+```
+Input: nums1 = [1,2,2,1], nums2 = [2,2]
+Output: [2]
+
+```
+
+**Example 2:**
+
+```
+Input: nums1 = [4,9,5], nums2 = [9,4,9,8,4]
+Output: [9,4]
+Explanation: [4,9] is also accepted.
+
+```
+
+**Constraints:**
+
+- `1 <= nums1.length, nums2.length <= 1000`
+- `0 <= nums1[i], nums2[i] <= 1000`
+</aside>
+----
+
+
++*In[14]:*+
+[source, ipython3]
+----
+def intersection(nums1, nums2):
+    set1 = set(nums1)
+    intersection = set()
+
+    for num in nums2:
+        if num in set1:
+            intersection.add(num)
+
+    return list(intersection)
+# Example 1
+nums1 = [1, 2, 2, 1]
+nums2 = [2, 2]
+result1 = intersection(nums1, nums2)
+print(result1)  
+
+# Example 2
+nums3 = [4, 9, 5]
+nums4 = [9, 4, 9, 8, 4]
+result2 = intersection(nums3, nums4)
+print(result2) 
+----
+
+
++*Out[14]:*+
+----
+[2]
+[9, 4]
+----
+
+
++*In[ ]:*+
+[source, ipython3]
+----
+
+----
+
+
++*In[ ]:*+
+[source, ipython3]
+----
+<aside>
+💡 8. **Intersection of Two Arrays II**
+
+Given two integer arrays `nums1` and `nums2`, return *an array of their intersection*. Each element in the result must appear as many times as it shows in both arrays and you may return the result in **any order**.
+
+**Example 1:**
+
+```
+Input: nums1 = [1,2,2,1], nums2 = [2,2]
+Output: [2,2]
+
+```
+
+**Example 2:**
+
+```
+Input: nums1 = [4,9,5], nums2 = [9,4,9,8,4]
+Output: [4,9]
+Explanation: [9,4] is also accepted.
+
+```
+
+**Constraints:**
+
+- `1 <= nums1.length, nums2.length <= 1000`
+- `0 <= nums1[i], nums2[i] <= 1000`
+</aside>
+----
+
+
++*In[15]:*+
+[source, ipython3]
+----
+def intersect(nums1, nums2):
+    dict1 = {}
+    dict2 = {}
+
+    for num in nums1:
+        dict1[num] = dict1.get(num, 0) + 1
+
+    for num in nums2:
+        dict2[num] = dict2.get(num, 0) + 1
+
+    intersection = []
+
+    for num in dict1:
+        if num in dict2:
+            count = min(dict1[num], dict2[num])
+            intersection.extend([num] * count)
+
+    return intersection
+# Example 1
+nums1 = [1, 2, 2, 1]
+nums2 = [2, 2]
+result1 = intersect(nums1, nums2)
+print(result1)  
+
+# Example 2
+nums3 = [4, 9, 5]
+nums4 = [9, 4, 9, 8, 4]
+result2 = intersect(nums3, nums4)
+print(result2) 
+----
+
+
++*Out[15]:*+
+----
+[2, 2]
+[4, 9]
+----
+
+
++*In[ ]:*+
+[source, ipython3]
+----
+
+----
+
+
++*In[ ]:*+
+[source, ipython3]
+----
+
+----
+
+
++*In[ ]:*+
+[source, ipython3]
+----
+
+----
+
+
++*In[ ]:*+
+[source, ipython3]
+----
+
+----
+
+
++*In[ ]:*+
+[source, ipython3]
+----
+
+----
+
+
++*In[ ]:*+
+[source, ipython3]
+----
+
+----
